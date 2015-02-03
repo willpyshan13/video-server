@@ -1,0 +1,18 @@
+Ext.application({
+	name:'dy',
+	appFolder:'js/app',
+	autoCreateViewport:true,
+	controllers:['MenuList'],
+	stores:['combo.Status'],
+	requires:[
+	          "dy.util.Renderer",
+	          'dy.store.combo.Status',
+	          'dy.store.combo.YesOrNo',
+	          "dy.view.UploadBox",
+	          "dy.view.BaseEditGrid",
+	          "dy.view.BaseLoadEditWindow",
+	          "dy.view.BaseEditWindow"
+	          ],
+	launch:function(){	
+	}
+});

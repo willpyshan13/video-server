@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+			http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<context:property-placeholder location="classpath:jdbc.properties" />
+	<!-- 
+	import the dataSource definition -->
+	<!-- DataSource configuration for Apache Commons DBCP. -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close" p:driverClassName="${jdbc.driverClassName}"
+		p:url="${jdbc.url}" p:username="${jdbc.username}" p:password="${jdbc.password}" />
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+		p:dataSource-ref="dataSource" p:packagesToScan="com.e_lliam.app.video.server.entity">
+		<property name="jpaVendorAdapter">  
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />  
+        </property> 
+        <property name="jpaPropertyMap">
+            <props>
+            	<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+            	<prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+            </props>
+        </property>
+	</bean>
+	<!-- @Repository -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory"></property>
+	</bean>
+	<!-- Instruct Spring to perform declarative transaction management automatically 
+		on annotated classes. -->
+	<tx:annotation-driven />
+	<context:component-scan base-package="com.e_lliam.app.video.server">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	<jpa:repositories base-package="com.e_lliam.app.video.server.dao" transaction-manager-ref="transactionManager"></jpa:repositories>
+</beans>
